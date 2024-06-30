@@ -1,7 +1,8 @@
 import json
 
+
 def lambda_handler(event, context):
     return {
-        'statusCode': 200,
-        'body': json.dumps('Hello from Lambda! GitHubActionでデプロイ')
+        "statusCode": 200,
+        "body": json.dumps("Hello from Lambda! GitHubActionを使います"),
     }
