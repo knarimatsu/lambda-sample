@@ -34,8 +34,10 @@ jobs:
               run: |
                   zip -r lambda.zip lambda
 
-            - name: Deploy Lambda function
-              run: |
-                  aws lambda update-function-code \
-                    --function-name my-lambda-function \
-                    --zip-file fileb://lambda.zip
+            - name: Deploy to Lambda
+                run: | 
+                    mkdir -p build
+                    cp -r * build/
+                    cd build
+                    zip -r function.zip .
+                    aws lambda update-function-code --function-name my-lambda-function --zip-file fileb://function.zip --region ap-northeast-1
