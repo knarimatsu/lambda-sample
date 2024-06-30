@@ -13,29 +13,23 @@ jobs:
             - name: Checkout code
               uses: actions/checkout@v2
 
-            - name: Set up python
-              uses: actions/setup-python@v4
+            - name: set-aws-credentials
+              uses: aws-actions/configure-aws-credentials@main
               with:
-                  python-version: "3.12.0"
+                  aws-region: ap-northeast-1
+                  role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+                  role-session-name: GitHubActions
 
-            - name: Install Dependencies
+            - name: get-caller-identity is allowed to run on role.
+              run: aws sts get-caller-identity
+
+            - name: setup-python
+              uses: actions/setup-python@v3
+              with:
+                  python-version: "3.x"
+
+            - name: lambda update
               run: |
-                  python -mpip install --upgrade pip
-                  pip install -r requirements.txt
-
-            - name: Zip Lambda function
-              run: zip -r lambda_function.zip .
-
-            - name: Uploard to S3
-              run: |
-                  aws s3 cp lambda_function.zip s3://narimatsu_lambda_sample/lambda_function.zip
-              env:
-                  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-                  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-            - name: Deploy Lambda function
-              run: |
-                  aws lambda update-function-code --function-name lambda_sample --s3-bucket narimatsu_lambda_sample --s3-key lambda_function.zip
-              env:
-                  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-                  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+                  pip3 install awscli
+                  cd lambda && zip -r package.zip ./*
+                  aws lambda update-function-code --function-name lambda_sample --zip-file fileb://package.zip --publish
