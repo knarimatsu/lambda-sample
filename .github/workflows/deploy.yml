@@ -30,6 +30,10 @@ jobs:
                   aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
                   aws-region: ap-northeast-1
 
+            - name: Zip Lambda directory
+              run: |
+                  zip -r lambda-function.zip lambda
+
             - name: Deploy Lambda function
               run: |
                   aws lambda update-function-code \
